@@ -36,6 +36,43 @@ app.use(express.json());
 
 // ---- Rutas ----
 
+// Ruta raíz — Página de bienvenida para el navegador web
+app.get('/', (_req, res) => {
+    res.send(`
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>API - Mini Cash Los Andes</title>
+            <style>
+                body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #09090f; color: #ffffff; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; text-align: center; }
+                .container { background: rgba(255, 255, 255, 0.05); padding: 40px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); max-width: 600px; }
+                h1 { color: #dbdee3; font-size: 2.5em; margin-bottom: 10px; }
+                p { color: #9a9cae; font-size: 1.1em; line-height: 1.6; margin-bottom: 20px; }
+                .status { display: inline-block; padding: 8px 16px; background-color: rgba(46, 204, 113, 0.2); color: #2ecc71; border-radius: 50px; font-weight: bold; font-size: 0.9em; margin-bottom: 30px; }
+                .endpoints code { background: rgba(255, 255, 255, 0.1); padding: 4px 8px; border-radius: 6px; font-family: monospace; color: #a181ff; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h1>🏦 Mini Cash Los Andes API</h1>
+                <div class="status">🟢 Servicio en línea y conectado</div>
+                <p>Bienvenido al backend oficial. Esta URL no está diseñada para ser navegada visualmente; es el motor de datos <b>exclusivo para la Aplicación Móvil</b>.</p>
+                <p class="endpoints" style="text-align: left; background: rgba(0,0,0,0.2); padding: 20px; border-radius: 10px;">
+                    <b>Endpoints principales:</b><br><br>
+                    • Salud: <a href="/api/health" style="color: #a181ff">/api/health</a><br>
+                    • Autenticación: <code>/api/auth/login</code><br>
+                    • Préstamos: <code>/api/loans/...</code><br>
+                    • Clientes: <code>/api/clients/...</code>
+                </p>
+                <p style="font-size: 0.8em; margin-top: 30px; color: #666;">© 2026 Mini Cash Los Andes S.A.C. Todos los derechos reservados.</p>
+            </div>
+        </body>
+        </html>
+    `);
+});
+
 // Ruta de salud — para verificar que el servidor está activo
 app.get('/api/health', (_req, res) => {
     res.json({
