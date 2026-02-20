@@ -1,0 +1,91 @@
+// Prisma Schema para MINI CASH LOS ANDES
+// Define las 4 tablas principales de la base de datos
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// =============================================
+// TABLA: User (Usuarios - clientes y admins)
+// =============================================
+model User {
+  id           Int      @id @default(autoincrement())
+  dni          String   @unique          // DNI peruano (8 dígitos)
+  nombres      String                    // Nombres del usuario
+  apellidos    String                    // Apellidos del usuario
+  telefono     String                    // Número de teléfono
+  email        String?                   // Email (opcional)
+  direccion    String?                   // Dirección (opcional)
+  ocupacion    String?                   // Ocupación
+  ingresoMensual Float?                  // Ingreso mensual en soles
+  passwordHash String                    // Contraseña hasheada con bcrypt
+  role         String   @default("CLIENT") // CLIENT o ADMIN
+  creditScore  Int      @default(30)     // Score crediticio (0-100)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relaciones
+  loans         Loan[]
+  creditHistory CreditHistory[]
+}
+
+// =============================================
+// TABLA: Loan (Préstamos)
+// =============================================
+model Loan {
+  id           Int      @id @default(autoincrement())
+  userId       Int                       // ID del cliente
+  amount       Float                     // Monto prestado (S/ 50-300)
+  term         Int                       // Plazo en meses (1-3)
+  monthlyRate  Float    @default(0.01)   // Tasa mensual (1%)
+  totalPayment Float                     // Total a devolver
+  monthlyPayment Float                   // Cuota mensual
+  totalInterest Float                    // Interés total
+  status       String   @default("PENDING") // PENDING, ACTIVE, COMPLETED, REJECTED, DEFAULTED
+  purpose      String?                   // Propósito del préstamo
+  rejectionReason String?                // Razón de rechazo (si aplica)
+  approvedAt   DateTime?                 // Fecha de aprobación
+  completedAt  DateTime?                 // Fecha de finalización
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relaciones
+  user     User      @relation(fields: [userId], references: [id])
+  payments Payment[]
+}
+
+// =============================================
+// TABLA: Payment (Pagos de cuotas)
+// =============================================
+model Payment {
+  id          Int      @id @default(autoincrement())
+  loanId      Int                        // ID del préstamo
+  amount      Float                      // Monto pagado
+  monthNumber Int                        // Número de cuota (1, 2, 3...)
+  paidAt      DateTime @default(now())   // Fecha de pago
+
+  // Relaciones
+  loan Loan @relation(fields: [loanId], references: [id])
+}
+
+// =============================================
+// TABLA: CreditHistory (Historial crediticio)
+// Registra cada evento que afecta el score
+// =============================================
+model CreditHistory {
+  id          Int      @id @default(autoincrement())
+  userId      Int                        // ID del usuario
+  eventType   String                     // LOAN_APPROVED, PAYMENT_MADE, LOAN_COMPLETED, LATE_PAYMENT, etc.
+  description String                     // Descripción legible del evento
+  scoreChange Int                        // Cambio en el score (+10, -5, etc.)
+  newScore    Int                        // Score después del cambio
+  createdAt   DateTime @default(now())
+
+  // Relaciones
+  user User @relation(fields: [userId], references: [id])
+}
