@@ -63,6 +63,7 @@ authRouter.post('/register', async (req, res) => {
         if (error instanceof z.ZodError) {
             return res.status(400).json({ error: 'Datos inválidos', details: error.errors });
         }
+        console.error('Error en /register:', error);
         res.status(500).json({ error: 'Error del servidor' });
     }
 });
@@ -114,6 +115,7 @@ authRouter.post('/login', async (req, res) => {
         if (error instanceof z.ZodError) {
             return res.status(400).json({ error: 'Datos inválidos', details: error.errors });
         }
+        console.error('Error en /login:', error);
         res.status(500).json({ error: 'Error del servidor' });
     }
 });
